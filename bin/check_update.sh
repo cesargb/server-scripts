@@ -17,14 +17,13 @@ if [ $(which yum) ];then
 elif [ $(which apt-get) ];then
     apt-get update >/dev/null
 
-    if [ $? != 0]; then
+    if [ $? != 0 ]; then
         echo "apt-get check update fail"
         exit $?
     fi
 
-    PACKAGES=`apt-get -s upgrade | grep "^Inst" | awk '{print $2}'`
-
-    if [ $? != 0]; then
+    PACKAGES=`apt-get -s upgrade | awk '{ if ($1=="Inst") {print $2} }'`
+    if [ $? != 0 ]; then
         echo "apt-get check update fail"
         exit $?
     fi
@@ -33,7 +32,8 @@ else
     exit 2
 fi
 
-fi [ "$PACKAGES" ]; then
+if [ "$PACKAGES" == "" ]; then
+    echo "This system is updated"
     exit 0
 else
     echo "$PACKAGES"
